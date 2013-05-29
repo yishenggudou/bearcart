@@ -1,0 +1,67 @@
+<!doctype>
+<head>
+    
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+	<script type="text/javascript">
+    {{ js_context }}
+    </script>
+
+<style>
+body {
+  font: 10px sans-serif;
+  width: {{ body_width }}px;
+  height: {{ body_height }}px;
+}
+#chart {
+    float: left;
+    margin-top: 70px;
+          }
+#y_axis {
+   float: left;
+   margin-top: 70px;
+          }
+#legend {
+        float: left;
+        margin-left: 15px;
+        margin-top: 70px;
+}
+
+{{ style_context }}
+</style>
+</head>
+<body>
+
+        <div id="y_axis"></div>
+        <div id="chart"></div>
+        <div id="legend"></div>
+
+
+<script>
+
+{{ palette }}
+
+
+$(document).ready(function() {
+var json = {{json_data}} 
+
+{{ graph }}
+
+{{ x_axis }}
+
+{{ x_axis_num }}
+
+{{ y_axis }}
+
+{{ hover }}
+
+{{ legend }}
+
+graph.render();
+
+});
+
+
+</script>
+
+</body>

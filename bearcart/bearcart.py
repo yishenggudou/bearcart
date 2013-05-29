@@ -187,8 +187,28 @@ class Chart(object):
         graph = self.env.get_template('graph.js')
         self.template_vars.update({'graph': graph.render(variables)})
 
+
+    def jsobj_data(self, json_data=None):
+        u"""
+        转换json数据为可以直接在模版中使用的字符串
+        """
+        try:
+            import cStringIO as StringIO
+        except:
+            import StringIO
+        json_data = json_data or self.json_data
+        f = StringIO.StringIO()
+        ll = json.dumps(json_data, sort_keys=True, indent=4,
+                  separators=(',', ': '))
+        f.write(ll)
+        f.flush()
+        return f.getvalue()
+
+
+
+
     def create_chart(self, html_path='index.html', data_path='data.json',
-                     js_path=None, css_path=None):
+                     js_path=None, css_path=None, use_stream=False, json_data=None):
         '''Save bearcart output to HTML and JSON.
 
         Parameters
@@ -204,6 +224,9 @@ class Chart(object):
             If passed, the Rickshaw css library will be saved to the
             path. The file must be named "rickshaw.min.css"
 
+        use_stream: Bool. default False
+            for 
+
         Returns
         -------
         HTML, JSON, JS, and CSS
@@ -218,7 +241,15 @@ class Chart(object):
         self.template_vars.update({'data_path': str(data_path)})
 
         self._build_graph()
-        html = self.env.get_template('bcart_template.html')
+        if use_stream:
+            html = self.env.get_template('bcart_template_stream.html')
+            self.template_vars.update({'json_data': self.jsobj_data(json_data)})
+            self.template_vars.update({'js_context': resource_string('bearcart', 'rickshaw.min.js')})
+            self.template_vars.update({'style_context': resource_string('bearcart', 'rickshaw.min.css')})
+            self.template_vars.update({'body_width':str(self.width+210)})
+            self.template_vars.update({'body_height':str(self.height)})
+        else:
+            html = self.env.get_template('bcart_template.html')
         self.HTML = html.render(self.template_vars)
 
         with open(html_path, 'w') as f:
@@ -236,3 +267,5 @@ class Chart(object):
             css = resource_string('bearcart', 'rickshaw.min.css')
             with open(css_path, 'w') as f:
                     f.write(css)
+        if use_stream:
+            return self.HTML 
